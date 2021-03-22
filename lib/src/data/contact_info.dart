@@ -33,4 +33,10 @@ class ContactInfo {
 		@required this.email,
 		@required this.phoneNumber,
 	});
+
+	Map get json => {
+		"name": name,
+		"email": email,
+		"phoneNumber": phoneNumber,
+	};
 }

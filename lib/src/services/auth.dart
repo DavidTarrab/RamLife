@@ -42,6 +42,8 @@ class Auth {
 	/// The user's full name.
 	static String get name => _currentUser?.displayName;
 
+	static String get uid => _currentUser?.uid;
+
 	/// Determines whether the user is currently logged
 	static bool get isSignedIn => _currentUser != null;
 

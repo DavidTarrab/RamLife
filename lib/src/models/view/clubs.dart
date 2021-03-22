@@ -2,16 +2,29 @@ import "package:ramaz/data.dart";
 import "package:ramaz/models.dart";
 import "package:ramaz/services.dart";
 
-abstract class ClubsModel {
+class ClubsModel {
+	// Get from CloudDatabase.
 	User user;
-	void registerForClub(Club club);
-	void unregisterFromClub(Club club);
-	void email(ContactInfo contact);
 
-	void init() {
+	ClubsModel() {
 		user = Models.instance.user.data;
 	}
 
+	Future<void> registerForClub(Club club) => Services
+		.instance
+		.database
+		.cloudDatabase
+		.registerForClub(club.id, user.contactInfo.json);
+
+	void unregisterFromClub(Club club) {
+		// Use Firestore to remove your contact info from the members collection
+	}
+
+	void email(ContactInfo contact) {
+		// Open an email app to contact this person. 
+	}
+
+	/// Gets a list of all the club for the user to browse. 
 	Future<List<Club>> getAllClubs() async {
 		// Step 1. Get the raw JSON. 
 		// Step 2. Turn them into a list of clubs

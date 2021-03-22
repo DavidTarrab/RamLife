@@ -220,10 +220,8 @@ class CloudDatabase extends Database {
 
 	@override
 	Future<List<Map<String, dynamic>>> get allClubs async {
-		const String collectionName = "clubs";
-		final CollectionReference clubsCollection = 
-			firestore.collection(collectionName);
 		final List<Map<String, dynamic>> result = [];
+		final CollectionReference clubsCollection = firestore.collection("clubs");
 		final QuerySnapshot query = await clubsCollection.get();
 		for (final DocumentSnapshot document in query.docs) {
 			result.add(document.data());
@@ -244,4 +242,11 @@ class CloudDatabase extends Database {
 					Map<String, dynamic>.from(entry)
 				]
 		);
+
+	Future<void> registerForClub(String clubId, Map data) => firestore
+		.collection("clubs")
+		.doc(clubId)
+		.collection("members")
+		.doc(Auth.uid)
+		.set(data);
 }
