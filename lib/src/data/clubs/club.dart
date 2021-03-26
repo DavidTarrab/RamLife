@@ -36,7 +36,7 @@ class Club {
 	/// 
 	/// When creating a club, the faculty advisor is not needed -- it can be 
 	/// assigned later by a club creator. [formUrl] can also be null.  
-	Club({
+	const Club({
 		required this.name,
 		required this.id,
 		required this.shortDescription,
@@ -45,12 +45,11 @@ class Club {
 		required this.captains,
 		required this.facultyAdvisor,
 		required this.imageUrl,
-		required this.isActive = true,
-		required this.tags = {},
-		required this.phoneNumberRequested,
-		required this.members = [],
-		required this.messages = [],
-		required this.attendance = {},
+		this.isActive = true,
+		this.tags = const {},
+		this.members = const [],
+		this.messages = const [],
+		this.attendance = const {},
 		this.formUrl,
 	});
 
