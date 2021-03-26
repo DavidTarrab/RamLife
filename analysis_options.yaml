@@ -14,8 +14,8 @@ linter:
     # - avoid_annotating_with_dynamic
     # - avoid_as  # dart 1 only
     - avoid_bool_literals_in_conditional_expressions
-    - avoid_catches_without_on_clauses
-    - avoid_catching_errors
+    # - avoid_catches_without_on_clauses
+    # - avoid_catching_errors
     - avoid_double_and_int_checks
     - avoid_empty_else
     - avoid_field_initializers_in_const_classes
@@ -57,7 +57,7 @@ linter:
     - empty_constructor_bodies
     - empty_statements
     - file_names
-    - flutter_style_todos
+    # - flutter_style_todos
     - hash_and_equals
     - implementation_imports
     - invariant_booleans
@@ -122,7 +122,7 @@ linter:
     - slash_for_doc_comments
     - sort_child_properties_last
     # - sort_constructors_first
-    - sort_pub_dependencies
+    # - sort_pub_dependencies
     - sort_unnamed_constructors_first
     - test_types_in_equals
     - throw_in_finally

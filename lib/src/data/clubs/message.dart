@@ -1,5 +1,3 @@
-import "package:meta/meta.dart";
-
 import "../contact_info.dart";
 
 class Message {
@@ -17,9 +15,9 @@ class Message {
 	String body;
 
 	Message({
-		@required this.sender,
-		@required this.timestamp,
-		@required this.body,
+		required this.sender,
+		required this.timestamp,
+		required this.body,
 	});
 
 }

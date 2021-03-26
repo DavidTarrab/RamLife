@@ -9,9 +9,9 @@ import "package:ramaz/widgets.dart";
 /// This widget must be a [StatefulWidget] in order to avoid recreating a 
 /// [TextEditingController] every time the widget tree is rebuilt. 
 class ReminderBuilder extends StatefulWidget {	
-	static void _noop(){}
-	static final Color _disabledColor = const RaisedButton(onPressed: _noop)
-		.disabledTextColor;
+	// static void _noop(){}
+	// static final Color _disabledColor = const RaisedButton(onPressed: _noop)
+	// 	.disabledTextColor;
 
 	/// Trims a string down to a certain length.
 	/// 
@@ -20,49 +20,22 @@ class ReminderBuilder extends StatefulWidget {
 	static String trimString (String text, int length) => text.length > length
 		? text.substring(0, length) : text;
 
-	/// Gets the text color for a [MaterialButton].
-	/// 
-	/// Due to a bug in Flutter v1.9, [RaisedButton]s in [ButtonBar]s in 
-	/// [AlertDialog]s do not respect [MaterialApp.theme.buttonTheme.textTheme]. 
-	/// This function creates a new [RaisedButton] (outside of an [AlertDialog])
-	/// and returns its text color. 
-	static Color getButtonTextColor(
-		BuildContext context, 
-		Brightness brightness,
-		{bool enabled}
-	) {
-		if (!enabled) {
-			return _disabledColor;
-		}
-		switch (Theme.of(context).buttonTheme.textTheme) {
-			case ButtonTextTheme.normal: return brightness == Brightness.dark
-				? Colors.white : Colors.black87;
-			case ButtonTextTheme.accent: return Theme.of(context).accentColor;
-			case ButtonTextTheme.primary: return Theme.of(context).primaryColor;
-			default: throw ArgumentError.notNull(
-				"MaterialApp.theme.buttonTheme.textTheme"
-			);
-		}
-	}
-
 	/// Opens a [ReminderBuilder] pop-up to create or modify a [Reminder]. 
-	static Future<Reminder> buildReminder(
-		BuildContext context, [Reminder reminder]
-	) => showDialog<Reminder>(
+	static Future<Reminder?> buildReminder(
+		BuildContext context, [Reminder? reminder]
+	) => showDialog(
 		context: context, 
-		builder: (_) => ReminderBuilder(reminder: reminder),
+		builder: (_) => ReminderBuilder(reminder),
 	);
 
 	/// A reminder to modify. 
 	/// 
 	/// A [ReminderBuilder] can either create a new [Reminder] from scratch or 
 	/// modify an existing reminder (auto-fill its properties). 
-	final Reminder reminder;
+	final Reminder? reminder;
 
 	/// Creates a widget to create or modify a [Reminder].
-	const ReminderBuilder({
-		this.reminder
-	}); 
+	const ReminderBuilder(this.reminder); 
 
 	@override 
 	ReminderBuilderState createState() => ReminderBuilderState();
@@ -79,137 +52,124 @@ class ReminderBuilderState extends State<ReminderBuilder> {
 	@override 
 	void initState() {
 		super.initState();
-		controller.text = widget.reminder?.message;
+		controller.text = widget.reminder?.message ?? "";
 	}
 
 	@override
 	Widget build(BuildContext context) => ModelListener<RemindersBuilderModel>(
 		model: () => RemindersBuilderModel(widget.reminder),
 		// ignore: sort_child_properties_last
-		child: FlatButton(
+		child: TextButton(
 			onPressed: Navigator.of(context).pop,
-			child: Text (
-				"Cancel", 
-				style: TextStyle (
-					color: ReminderBuilder.getButtonTextColor(
-						context, 
-						Theme.of(context).brightness,
-						enabled: true
-					),
-				)
-			),
+			child: const Text("Cancel"),
 		),
-		builder: (BuildContext context, RemindersBuilderModel model, Widget back) =>
+		builder: (BuildContext context, RemindersBuilderModel model, Widget? back) =>
 			AlertDialog(
 				title: Text (widget.reminder == null ? "Create reminder" : "Edit reminder"),
 				actions: [
-					back,
-					RaisedButton(
-						color: Theme.of(context).buttonColor,
+					back!,
+					ElevatedButton(
 						onPressed: model.ready
 							? () => Navigator.of(context).pop(model.build())
 							: null,
-						child: Text (
-							"Save", 
-							style: TextStyle (
-								color: ReminderBuilder.getButtonTextColor(
-									context, 
-									ThemeData.estimateBrightnessForColor(
-										Theme.of(context).buttonColor
-									),
-									enabled: model.ready,
-								),
-							)
-						),
+						child: const Text("Save"),
 					)
 				],
-				content: SingleChildScrollView(
-					child: Column (
-						mainAxisSize: MainAxisSize.min,
-						children: [
-							TextField (
-								controller: controller,
-								onChanged: model.onMessageChanged,
-								textCapitalization: TextCapitalization.sentences,
+				content: Column (
+					mainAxisSize: MainAxisSize.min,
+					children: [
+						TextField (
+							controller: controller,
+							onChanged: model.onMessageChanged,
+							textCapitalization: TextCapitalization.sentences,
+						),
+						const SizedBox (height: 20),
+						RadioListTile<ReminderTimeType> (
+							value: ReminderTimeType.period,
+							groupValue: model.type,
+							// if toggleable is false (default), the value can never be null
+							onChanged: (value) => model.toggleRepeatType(value!),  
+							title: Text (
+								"${model.shouldRepeat ? 'Repeats every' : 'On'} period"
 							),
-							const SizedBox (height: 20),
-							Wrap(
-								children: [
-									RadioListTile<ReminderTimeType> (
-										value: ReminderTimeType.period,
-										groupValue: model.type,
-										onChanged: model.toggleRepeatType,
-										title: Text (
-											"${model.shouldRepeat ? 'Repeats every' : 'On'} period"
-										),
-									),
-									RadioListTile<ReminderTimeType> (
-										value: ReminderTimeType.subject,
-										groupValue: model.type,
-										onChanged: model.toggleRepeatType,
-										title: Text (
-											"${model.shouldRepeat ? 'Repeats every' : 'On'} subject"
-										),
-									),
-								]
+						),
+						RadioListTile<ReminderTimeType> (
+							value: ReminderTimeType.subject,
+							groupValue: model.type,
+							// if toggleable is false (default), the value can never be null
+							onChanged: (value) => model.toggleRepeatType(value!),
+							title: Text (
+								"${model.shouldRepeat ? 'Repeats every' : 'On'} subject"
 							),
-							const SizedBox (height: 20),
-							if (model.type == ReminderTimeType.period) ...[
-								ListTile (
-									title: const Text ("Day"),
-									trailing: DropdownButton<String>(
-										items: [
-											for (final String dayName in Models.instance.schedule.user.dayNames)
-												DropdownMenuItem(
-													value: dayName,
-													child: Text(dayName),
-												),
-										],
-										onChanged: model.changeDay,
-										value: model.dayName,
-										hint: const Text("Day"),
-									),
+						),
+						const SizedBox (height: 20),
+						if (model.type == ReminderTimeType.period) ...[
+							ListTile (
+								title: const Text ("Day"),
+								trailing: DropdownButton<String>(
+									items: [
+										for (final String dayName in Models.instance.schedule.user.dayNames)
+											DropdownMenuItem(
+												value: dayName,
+												child: Text(dayName),
+											),
+									],
+									onChanged: (String? value) {
+										if (value != null) {
+											model.changeDay(value);
+										}
+									},
+									value: model.dayName,
+									hint: const Text("Day"),
 								),
-								ListTile (
-									title: const Text ("Period"),
-									trailing: DropdownButton<String> (
-										items: [
-											for (final String period in model.periods ?? [])
-												DropdownMenuItem(
-													value: period,
-													child: Text (period),
-												)
-										],
-										onChanged: model.changePeriod,
-										value: model.period,
-										hint: const Text ("Period"),
-									)
+							),
+							ListTile (
+								title: const Text ("Period"),
+								trailing: DropdownButton<String> (
+									items: [
+										for (final String period in model.periods ?? [])
+											DropdownMenuItem(
+												value: period,
+												child: Text (period),
+											)
+									],
+									onChanged: (String? value) {
+										if (value != null) {
+											model.changePeriod(value);
+										}
+									},
+									value: model.period,
+									hint: const Text ("Period"),
 								)
-							] else if (model.type == ReminderTimeType.subject)
-								ListTile (
-									title: const Text ("Class"),
-									trailing: DropdownButton<String>(
-										items: [
-											for (final String course in model.courses)
-												DropdownMenuItem(
-													value: course,
-													child: Text("${ReminderBuilder.trimString(course, 14)}..."),
-												)
-										],
-										onChanged: model.changeCourse,
-										value: model.course,
-										isDense: true,
-										hint: const Text ("Class"),
-									)
-								),
-							SwitchListTile (
-								value: model.shouldRepeat,
-								onChanged: model.toggleRepeat,
-								title: const Text ("Repeat"),
-								secondary: const Icon (Icons.repeat),
+							)
+						] else if (model.type == ReminderTimeType.subject)
+							ListTile (
+								title: const Text ("Class"),
+								trailing: DropdownButton<String>(
+									items: [
+										for (final String course in model.courses)
+											DropdownMenuItem(
+												value: course,
+												child: Text("${ReminderBuilder.trimString(course, 14)}..."),
+											)
+									],
+									onChanged: (String? value) {
+										if (value != null) {
+											model.changeCourse(value);
+										}
+									},
+									value: model.course,
+									isDense: true,
+									hint: const Text ("Class"),
+								)
 							),
-						]
-					)
+						SwitchListTile (
+							value: model.shouldRepeat,
+							onChanged: model.toggleRepeat,
+							title: const Text ("Repeat"),
+							secondary: const Icon (Icons.repeat),
+						),
+					]
 				)
 			)
 	);

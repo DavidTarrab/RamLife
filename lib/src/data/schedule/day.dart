@@ -16,29 +16,32 @@ class Day {
 	/// 
 	/// Each element of [data]'s months should be a JSON representation of a [Day].
 	/// See [Day.fromJson] for how to represent a Day in JSON. 
-	static List<List<Day>> getCalendar(List<List<Map<String, dynamic>>> data) => [
-		for (final List<Map<String, dynamic>> month in data)
+	static List<List<Day?>> getCalendar(
+		List<List<Map<String, dynamic>?>> data
+	) => [
+		for (final List<Map<String, dynamic>?> month in data)
 			getMonth(month)
 	];
 
 	/// Parses a particular month from JSON. 
 	/// 
 	/// See [Day.getCalendar] for details.
-	static List<Day> getMonth(List<Map<String, dynamic>> data) => [
-		for (final Map<String, dynamic> json in data)
-			Day.fromJson(json)
+	static List<Day?> getMonth(List<Map<String, dynamic>?> data) => [
+		for (final Map<String, dynamic>? json in data)
+			if (json == null) null
+			else Day.fromJson(json)
 	];
 
 	/// Converts a month in the calendar to JSON. 
 	/// 
 	/// This is how it is currently stored in the database. 
-	static List<Map<String, dynamic>> monthToJson(List<Day> month) => [
-		for (final Day day in month)
-			day.toJson()
+	static List<Map<String, dynamic>?> monthToJson(List<Day?> month) => [
+		for (final Day? day in month)
+			day?.toJson()
 	];
 
 	/// Gets the Day for [date] in the [calendar].
-	static Day getDate(List<List<Day>> calendar, DateTime date) => 
+	static Day? getDate(List<List<Day?>> calendar, DateTime date) => 
 		calendar [date.month - 1] [date.day - 1];
 
 	/// The name of this day. 
@@ -53,8 +56,8 @@ class Day {
 
 	/// Returns a new Day from a [name] and [Special].
 	const Day({
-		@required this.name,
-		@required this.special
+		required this.name,
+		required this.special
 	});
 
 	/// Returns a Day from a JSON object.
@@ -105,25 +108,15 @@ class Day {
 	/// If [name] is null, returns null. 
 	/// Otherwise, returns [name] and [special].
 	/// If [special] was left as the default, will only return the [name].
-	String get displayName => name == null
-		? "No School"
-		: "$name${
-			special == Special.regular || special == Special.rotate 
-				? '' : ' ${special.name}'
-		}";
+	String get displayName => "$name ${special.name}";
 
 	/// Whether to say "a" or "an".
 	/// 
 	/// Remember, [name] can be a letter and not a word. 
 	/// So a letter like "R" might need "an" while "B" would need "a".
-	String get n => {"A", "E", "I", "O", "U"}.contains(name [0])
+	String get n => 
+		{"A", "E", "I", "O", "U"}.contains(name [0])
 		|| {"A", "M", "R", "E", "F"}.contains(name) ? "n" : "";
-
-	/// Whether there is school on this day.
-	bool get school => name != null;
-
-	/// Whether the times for this day are known.
-	bool get isModified => special == Special.modified;
 
 	/// The period right now. 
 	/// 
@@ -131,9 +124,9 @@ class Day {
 	/// and uses [DateTime.now()] to look up what period it is right now. 
 	/// 
 	/// See [Time] and [Range] for implementation details.
-	int get period {
+	int? get period {
 		final Time time = Time.fromDateTime (DateTime.now());
-		for (int index = 0; index < (special.periods?.length ?? 0); index++) {
+		for (int index = 0; index < (special.periods.length); index++) {
 			final Range range = special.periods [index];
 			if (
 				range.contains(time) ||  // during class

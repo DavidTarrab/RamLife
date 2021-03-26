@@ -1,5 +1,3 @@
-import "package:meta/meta.dart";
-
 /// Holds personal information about the user. 
 /// 
 /// While [name] and [email] can be read from the authentication service, 
@@ -25,13 +23,13 @@ class ContactInfo {
 	/// 
 	/// This is filled in voluntary by the user, and cannot be retrieved from the 
 	/// database. So this field will start off null, and be populated over time. 
-	final String phoneNumber;
+	final String? phoneNumber;
 
 	/// Bundles personal info about the user. 
 	ContactInfo({
-		@required this.name,
-		@required this.email,
-		@required this.phoneNumber,
+		required this.name,
+		required this.email,
+		this.phoneNumber,
 	});
 
 	Map get json => {

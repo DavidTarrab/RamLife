@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 import "package:flutter/material.dart";
 
-import "package:ramaz/constants.dart";  // for route names
+import "package:ramaz/pages.dart";
 import "package:ramaz/models.dart";
 import "package:ramaz/services.dart";
 import "package:ramaz/widgets.dart";
@@ -11,6 +11,9 @@ class NavigationDrawer extends StatelessWidget {
 	/// Uses the navigator to launch a page by name.
 	static Future<void> Function() pushRoute(BuildContext context, String name) => 
 		() => Navigator.of(context).pushReplacementNamed(name);
+
+	final bool isOnHomePage;
+	const NavigationDrawer({this.isOnHomePage = false});
 
 	@override Widget build (BuildContext context) => Drawer (
 		child: LayoutBuilder(
@@ -26,21 +29,23 @@ class NavigationDrawer extends StatelessWidget {
 						child: Column(
 							children: [
 								DrawerHeader (child: RamazLogos.ramSquare),
-								ListTile (
-									title: const Text ("Home"),
-									leading: Icon (Icons.home),
-									onTap: pushRoute(context, Routes.home),
-								),
-								ListTile (
-									title: const Text ("Schedule"),
-									leading: Icon (Icons.schedule),
-									onTap: pushRoute(context, Routes.schedule),
-								),
-								ListTile (
-									title: const Text ("Reminders"),
-									leading: Icon (Icons.note),
-									onTap: pushRoute(context, Routes.reminders),
-								),
+								if (!isOnHomePage) ...[
+									ListTile (
+										title: const Text ("Dashboard"),
+										leading: Icon (Icons.dashboard),
+										onTap: pushRoute(context, Routes.home),
+									),
+									ListTile (
+										title: const Text ("Schedule"),
+										leading: Icon (Icons.schedule),
+										onTap: pushRoute(context, Routes.schedule),
+									),
+									ListTile (
+										title: const Text ("Reminders"),
+										leading: Icon (Icons.note),
+										onTap: pushRoute(context, Routes.reminders),
+									),
+								],
 								// ListTile (
 								// 	title: Text ("Sports"),
 								// 	leading: Icon (Icons.directions_run),
@@ -49,7 +54,7 @@ class NavigationDrawer extends StatelessWidget {
 								if (Models.instance.user.isAdmin)
 									ListTile(
 										title: const Text("Admin console"),
-										leading: Icon(Icons.verified_user),
+										leading: Icon(Icons.admin_panel_settings),
 										onTap: pushRoute(context, Routes.admin),
 									),
 								BrightnessChanger.dropdown(prefs: Services.instance.prefs),

@@ -3,24 +3,28 @@ import "package:flutter/material.dart";
 import "package:ramaz/constants.dart";
 import "package:ramaz/pages.dart";
 import "package:ramaz/widgets.dart";
-import "package:ramaz/services.dart";
 
 /// The main app widget. 
-class RamLife extends StatefulWidget {
-	/// Whether the user is already signed in. 
-	final bool isSignedIn;
+class RamLife extends StatelessWidget {
+	/// The routes for this app.
+	static final Map<String, WidgetBuilder> routes = {
+		Routes.login: (_) => Login(),
+		Routes.home: (_) => const HomePage(),
+		Routes.schedule: (_) => const HomePage(pageIndex: 1),
+		Routes.reminders: (_) => const HomePage(pageIndex: 2),
+		Routes.feedback: (_) => FeedbackPage(),
+		Routes.calendar: (_) => CalendarPage(),
+		Routes.specials: (_) => SpecialPage(),
+		Routes.admin: (_) => AdminHomePage(),
+		Routes.sports: (_) => SportsPage(),
+	};
 
-	/// Creates the main app widget.
-	const RamLife ({this.isSignedIn});
+	/// Provides a const constructor.
+	const RamLife();
 
-	@override
-	RamLifeState createState() => RamLifeState();
-}
-
-class RamLifeState extends State<RamLife> {
 	@override 
 	Widget build (BuildContext context) => ThemeChanger(
-		defaultBrightness: null,
+		defaultBrightness: Brightness.light,
 		light: ThemeData (
 			brightness: Brightness.light,
 			primarySwatch: Colors.blue,
@@ -30,13 +34,20 @@ class RamLifeState extends State<RamLife> {
 			primaryColorDark: RamazColors.blueDark,
 			accentColor: RamazColors.gold,
 			accentColorBrightness: Brightness.light,
-			cursorColor: RamazColors.blueLight,
-			textSelectionHandleColor: RamazColors.blueLight,
+			textSelectionTheme: const TextSelectionThemeData(
+				cursorColor: RamazColors.blueLight,
+				selectionHandleColor: RamazColors.blueLight,
+			),
 			buttonColor: RamazColors.gold,
 			buttonTheme: const ButtonThemeData (
 				buttonColor: RamazColors.gold,
 				textTheme: ButtonTextTheme.normal,
 			),
+			elevatedButtonTheme: ElevatedButtonThemeData(
+				style: ButtonStyle(
+					backgroundColor: MaterialStateProperty.all(RamazColors.gold)
+				)
+			)
 		),
 		dark: ThemeData(
 			brightness: Brightness.dark,
@@ -54,8 +65,10 @@ class RamLifeState extends State<RamLife> {
 				backgroundColor: RamazColors.goldDark,
 				foregroundColor: RamazColors.blue
 			),
-			cursorColor: RamazColors.blueLight,
-			textSelectionHandleColor: RamazColors.blueLight,
+			textSelectionTheme: const TextSelectionThemeData(
+				cursorColor: RamazColors.blueLight,
+				selectionHandleColor: RamazColors.blueLight,
+			),
 			cardTheme: CardTheme (
 				color: Colors.grey[820]
 			),
@@ -65,36 +78,36 @@ class RamLifeState extends State<RamLife> {
 				buttonColor: RamazColors.blueDark, 
 				textTheme: ButtonTextTheme.accent,
 			),
+			elevatedButtonTheme: ElevatedButtonThemeData(
+				style: ButtonStyle(
+					backgroundColor: MaterialStateProperty.all(RamazColors.blueDark)
+				)
+			),
 		),
 		builder: (BuildContext context, ThemeData theme) => MaterialApp (
-			home: widget.isSignedIn == null 
-				? SplashScreen()
-				: widget.isSignedIn ? HomePage() : const Login(),
+			initialRoute: Routes.home,
 			title: "Ram Life",
 			color: RamazColors.blue,
 			theme: theme,
-			routes: {
-				Routes.login: enforceLogin((_) => const Login()),
-				Routes.home: enforceLogin((_) => HomePage()),
-				Routes.schedule: enforceLogin((_) => SchedulePage()),
-				Routes.reminders: enforceLogin((_) => RemindersPage()),
-				Routes.feedback: enforceLogin((_) => FeedbackPage()),
-				Routes.calendar: enforceLogin((_) => CalendarPage()),
-				Routes.specials: enforceLogin((_) => SpecialPage()),
-				Routes.admin: enforceLogin((_) => AdminHomePage()),
-				Routes.sports: enforceLogin((_) => SportsPage()),
-			}
+			onGenerateRoute: (RouteSettings settings) => PageRouteBuilder(
+        settings: settings, 
+        transitionDuration: Duration.zero,
+        pageBuilder: (BuildContext context, __, ___) {
+        	final String routeName = 
+        		(settings.name == null || !routes.containsKey(settings.name))
+	        		? Routes.home : settings.name!;
+	        return settings.name == Routes.login 
+	        	? RouteInitializer(
+	        		// If this page is Routes.login, don't set an error handler.
+	        		onError: null ,
+	        		isAllowed: () => true,
+	        		child: routes [routeName]! (context),
+        		)
+        		: RouteInitializer(
+        			child: routes [routeName]! (context),
+      			);
+        },
+      )
 		)
 	);
-
-	WidgetBuilder enforceLogin(WidgetBuilder builder) => 
-		(_) {
-			if (widget.isSignedIn == null) {
-				return SplashScreen();
-			} else if (!Services.instance.database.isSignedIn) {
-				return Login(builder);
-			} else {
-				return builder(_);
-			}
-		};
 }

@@ -11,19 +11,24 @@ enum Scope {
 	calendar, 
 
 	/// The admin can access and modify student schedules.
-	schedule
+	schedule,
+
+	/// The admin can create and update sports games.
+	sports,
 }
 
 /// Maps Strings to their respective [Scope]s.
 const Map<String, Scope> stringToScope = {
 	"calendar": Scope.calendar,
 	"schedule": Scope.schedule,
+	"sports": Scope.sports,
 };
 
 /// Maps [Scope]s to Strings. 
 const Map<Scope, String> scopeToString = {
 	Scope.calendar: "calendar",
 	Scope.schedule: "schedule",
+	Scope.sports: "sports",
 };
 
 /// A system administrator. 
@@ -47,16 +52,17 @@ class Admin {
 
 	/// Creates a user with administrative privileges. 
 	const Admin ({
-		this.scopes, 
-		this.specials,
-		this.email,
+		required this.scopes, 
+		required this.specials,
+		required this.email,
 	});
 
 	/// Creates an admin from a JSON entry. 
 	Admin.fromJson(Map<String, dynamic> json, List<String> _scopes) :
 		scopes = [
 			for (String scope in _scopes)
-				stringToScope [scope]
+				if (stringToScope.containsKey(scope))
+					stringToScope [scope]!
 		],
 		email = json ["email"],
 		specials = [

@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 
-import "package:ramaz/constants.dart";
+import "package:ramaz/pages.dart";
 import "package:ramaz/models.dart";
 import "package:ramaz/widgets.dart";
 
@@ -15,13 +15,14 @@ class Footer extends StatelessWidget {
 	/// A scale factor for the footer text. 
 	static const double textScale = 1.25;
 
-	@override Widget build (BuildContext context) => ModelListener<Schedule>(
+	@override 
+	Widget build (BuildContext context) => ModelListener<Schedule>(
 		model: () => Models.instance.schedule,
 		dispose: false,
 		// ignore: sort_child_properties_last
 		child: Container(height: 0, width: 0),
-		builder: (BuildContext context, Schedule schedule, Widget blank) =>
-			schedule.nextPeriod == null ? blank : BottomSheet (
+		builder: (_, Schedule schedule, Widget? blank) =>
+			schedule.nextPeriod == null ? blank! : BottomSheet (
 				enableDrag: false,
 				onClosing: () {},
 				builder: (BuildContext context) => GestureDetector(
@@ -40,11 +41,13 @@ class Footer extends StatelessWidget {
 								mainAxisAlignment: MainAxisAlignment.center,
 								children: [
 									Text (
-										"Next: ${schedule.nextPeriod.getName(schedule.nextSubject)}",
+										// ternary already checked for schedule.nextPeriod == null
+										"Next: ${schedule.nextPeriod!.getName(schedule.nextSubject)}",
 										textScaleFactor: textScale
 									),
 									Text (
-										(schedule.nextPeriod
+										// ternary already checked for schedule.nextPeriod == null
+										(schedule.nextPeriod!
 											.getInfo(schedule.nextSubject)
 											..removeWhere(
 												(String str) => (

@@ -1,5 +1,3 @@
-import "package:meta/meta.dart";
-
 import "../contact_info.dart";
 import "message.dart";
 
@@ -25,7 +23,7 @@ class Club {
 	final String imageUrl;
 	final bool isActive;
 	final Set<String> tags;
-	final String formUrl;
+	final String? formUrl;
 	final bool phoneNumberRequested;
 
 	final ContactInfo facultyAdvisor;
@@ -39,21 +37,22 @@ class Club {
 	/// When creating a club, the faculty advisor is not needed -- it can be 
 	/// assigned later by a club creator. [formUrl] can also be null.  
 	Club({
-		@required this.id,
-		@required this.name,
-		@required this.description,
-		@required this.shortDescription,
-		@required this.imageUrl,
-		@required this.isActive,
-		@required this.tags,
-		@required this.phoneNumberRequested,
-		@required this.captains,
+		required this.name,
+		required this.id,
+		required this.shortDescription,
+		required this.description,
+		required this.phoneNumberRequested,
+		required this.captains,
+		required this.facultyAdvisor,
+		required this.imageUrl,
+		required this.isActive = true,
+		required this.tags = {},
+		required this.phoneNumberRequested,
+		required this.members = [],
+		required this.messages = [],
+		required this.attendance = {},
 		this.formUrl,
-		this.facultyAdvisor,
-	}) : 
-		members = [],
-		messages = [],
-		attendance = {};
+	});
 
 	/// Creates a club from a JSON object.
 	Club.fromJson(Map<String, dynamic> json) : 
