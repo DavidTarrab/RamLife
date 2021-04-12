@@ -63,6 +63,9 @@ class Services implements Service {
 	/// The functions of this service operate on these services. 
 	late final List<Service> services;
 
+	/// Whether the services are ready to use.
+	bool isReady = false;
+
 	/// Bundles services together. 
 	/// 
 	/// Also initializes [services].
@@ -75,6 +78,7 @@ class Services implements Service {
 		for (final Service service in services) {
 			await service.init();
 		}
+		isReady = true;
 	}
 
 	@override

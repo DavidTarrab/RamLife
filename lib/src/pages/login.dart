@@ -24,7 +24,7 @@ class Login extends StatefulWidget {
 	final String destination;
 
 	/// Builds the login page
-	Login({this.destination = Routes.home});
+	const Login({this.destination = Routes.home});
 
 	@override 
 	LoginState createState() => LoginState();
@@ -51,7 +51,7 @@ class LoginState extends State<Login> {
 		appBar: AppBar (
 			title: const Text ("Login"),
 			actions: [
-				BrightnessChanger.iconButton(prefs: Services.instance.prefs),
+				BrightnessChanger.iconButton(),
 			],
 		),
 		body: Center(

@@ -55,7 +55,7 @@ class ScheduleModel with ChangeNotifier {
 		}
 		day = selected;
 		_selectedDay = justDate;
-		update (newName: selected.name, newSpecial: selected.special);
+		notifyListeners();
 	}
 
 	/// Gets the date whose schedule the user is looking at
